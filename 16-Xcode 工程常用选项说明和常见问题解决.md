@@ -92,29 +92,28 @@ iCloud container ID 可以对应多个 Bundle ID，我的理解也就是多个 A
 
 [苹果官方的属性 Key 和 Value列表](https://developer.apple.com/library/content/documentation/General/Reference/InfoPlistKeyReference/Introduction/Introduction.html)
 
-*Bundle display name*: App 的名称，在 App Store 的介绍页中显示，以及安装后在图标下显示
+**Bundle display name**: App 的名称，在 App Store 的介绍页中显示，以及安装后在图标下显示
 
-*Bundle name*：默认的  value 是 **${PRODUCT_NAME}**，PRODUCT_NAME 是在 Build 项目时执行的一个 Shell 脚本中导出的环境变量，它的值实际就是 Xcode 左边栏中的项目名称。类似的 Key 还有 *Executable file*，value 是 ${EXECUTABLE_NAME}。（Tips: 如何查看 Xcode 中所有可用的环境变量？见下图）
+**Bundle name**：默认的  value 是 **${PRODUCT_NAME}**，PRODUCT_NAME 是在 Build 项目时执行的一个 Shell 脚本中导出的环境变量，它的值实际就是 Xcode 左边栏中的项目名称。类似的 Key 还有 *Executable file*，value 是 ${EXECUTABLE_NAME}。（Tips: 如何查看 Xcode 中所有可用的环境变量？见下图）
 
-![查看 Xcode 环境变量](https://raw.githubusercontent.com/ilower/Xcode-Project-setting/master/images/show_env_var.png)
-
+![查看 Xcode 环境变量](https://github.com/ilower/Xcode-Project-setting/blob/master/images/show_env_var.png?raw=true)
 
 
 有几个配置项和 **General** 标签页中的一样，在这两处其中任意一处修改的效果相同。
 
-*Bundle identifier*，*Bundle version*（Build），*Bundle versions string, short*（Version），*Status bar is initially hidden*，*Supported interface orientations*
+**Bundle identifier*，*Bundle version*（Build），*Bundle versions string, short*（Version），*Status bar is initially hidden*，*Supported interface orientations**
 
 另外说两个重要的 Key：
-*Fonts provided by application*: 指定 App 使用的自定义字体，其 value 是个 array，可以同时指定多个字体文件名称，同时再将自定义字体文件添加到项目的 Resources 目录下就可以在 App 中使用了。
+**Fonts provided by application**: 指定 App 使用的自定义字体，其 value 是个 array，可以同时指定多个字体文件名称，同时再将自定义字体文件添加到项目的 Resources 目录下就可以在 App 中使用了。
 
-*NSAppTransportSecurity*：[官方说明](https://developer.apple.com/library/content/documentation/General/Reference/InfoPlistKeyReference/Articles/CocoaKeys.html#//apple_ref/doc/uid/TP40009251-SW33)
+**NSAppTransportSecurity**：[官方说明](https://developer.apple.com/library/content/documentation/General/Reference/InfoPlistKeyReference/Articles/CocoaKeys.html#//apple_ref/doc/uid/TP40009251-SW33)
 
-其 value 是 dictionary，通过添加子项 *NSAllowsArbitraryLoads* （可设置 YES 或 NO）来忽略或遵守 iOS 9 以上系统对所有 HTTP 连接都必须使用 HTTPS 的规则。之前 iOS 系统刚升级到 9.0 时，由于我们项目相关的 http 服务没有来得及支持 HTTPS，所以将 *NSAllowsArbitraryLoads* 临时设置为 YES 来避免 App 默认用 HTTPS 协议导致连接失败的问题。后来所有相关的服务都支持 HTTPS 之后，就把 *NSAllowsArbitraryLoads* 改回 NO，使用更安全的 HTTPS 协议。
+其 value 是 dictionary，通过添加子项 **NSAllowsArbitraryLoads** （可设置 YES 或 NO）来忽略或遵守 iOS 9 以上系统对所有 HTTP 连接都必须使用 HTTPS 的规则。之前 iOS 系统刚升级到 9.0 时，由于我们项目相关的 http 服务没有来得及支持 HTTPS，所以将 **NSAllowsArbitraryLoads** 临时设置为 YES 来避免 App 默认用 HTTPS 协议导致连接失败的问题。后来所有相关的服务都支持 HTTPS 之后，就把 **NSAllowsArbitraryLoads** 改回 NO，使用更安全的 HTTPS 协议。
 
 #### *URL Types*####
 
 这个配置项设置后，可以在 Objective C 代码中通过一种类似URL请求的方案来检查系统是否安装了某个 App。
-实际对应 Info.plist 文件中的 key —— CFBundleURLTypes，其 value 是一个 array，array 的每个元素又是一个 dictionary，在 dictionary 设置一个 App 相关的模式字符串。
+实际对应 Info.plist 文件中的 key —— **CFBundleURLTypes**，其 value 是一个 array，array 的每个元素又是一个 dictionary，在 dictionary 设置一个 App 相关的模式字符串。
 
 [官方说明](https://developer.apple.com/library/content/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html#//apple_ref/doc/uid/TP40009249-102207-TPXREF115)   [LSApplicationQueriesSchemes](https://developer.apple.com/library/content/documentation/General/Reference/InfoPlistKeyReference/Articles/LaunchServicesKeys.html#//apple_ref/doc/uid/TP40009250-SW14)   [canOpenURL](https://developer.apple.com/documentation/uikit/uiapplication/1622952-canopenurl)
 
@@ -128,7 +127,26 @@ iCloud container ID 可以对应多个 Bundle ID，我的理解也就是多个 A
 
 #### *Basic*####
 
-##### *Architextures*#####
+##### *Architextures*（[参考](http://www.jianshu.com/p/3fce0bd6f045)）#####
+
+###### *Architextures*：
+
+指定项目被编译成可支持哪些处理器指令集类型，同时支持的指令集越多，就会编译出包含多个指令集代码的数据包，对应生成二进制包就越大，也就是ipa包会变大。
+
+常见的有 armv7(32位)，arm64(64位)，armv7s，这些是移动处理器ARM的指令集，开发手机 App 时需要支持。i386 和 x86_64 是Mac处理器的指令集，如果开发一个在 Mac 上运行的 App，就选择这两个处理器架构。
+
+###### *Base SDK*:
+
+指定项目编译时基于的 iOS 的 SDK 名称或路径，以便引用正确的头文件和库文件。这个路径是所有 search paths 的前缀，同时也会作为环境变量传递给编译器和连接器。 
+
+###### *Build Active Architexture Only*:
+
+指定是否只对当前连接调试设备所支持的指令集进行编译。
+当连接移动设备进行调试时，设置为YES，就只编译当前设备的 architecture 版本；而设置为 NO 时，会编译 Architextures 选项中设置的所有指令集的版本。 所以，一般联机调试的时候可以选择设置为 YES，可以节约编译时间，出 release 包的时候再改为 NO，以适应不同设备。
+
+###### *Valid Architextures*:
+
+限制可能被支持的指令集的范围，也就是 Xcode 编译出来的二进制包类型最终从这些类型产生，而编译出哪种指令集的包，将由 Architectures 与 Valid Architectures（因此这个不能为空）的交集来确定。
 
 ##### *Build Options*#####
 

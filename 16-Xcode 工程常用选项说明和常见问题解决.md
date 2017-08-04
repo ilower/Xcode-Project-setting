@@ -113,7 +113,7 @@ iCloud container ID 可以对应多个 Bundle ID，我的理解也就是多个 A
 #### *URL Types*####
 
 这个配置项设置后，可以在 Objective C 代码中通过一种类似URL请求的方案来检查系统是否安装了某个 App。
-实际对应 Info.plist 文件中的 key —— **CFBundleURLTypes**，其 value 是一个 array，array 的每个元素又是一个 dictionary，在 dictionary 设置一个 App 相关的模式字符串。
+实际对应 Info.plist 文件中的 key —— **CFBundleURLTypes**，其 value 是一个 array，array 的每个元素又是一个 dictionary，在 dictionary 设置一个 App 相关的模式字符串用于查找。
 
 [官方说明](https://developer.apple.com/library/content/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html#//apple_ref/doc/uid/TP40009249-102207-TPXREF115)   [LSApplicationQueriesSchemes](https://developer.apple.com/library/content/documentation/General/Reference/InfoPlistKeyReference/Articles/LaunchServicesKeys.html#//apple_ref/doc/uid/TP40009250-SW14)   [canOpenURL](https://developer.apple.com/documentation/uikit/uiapplication/1622952-canopenurl)
 
@@ -127,7 +127,7 @@ iCloud container ID 可以对应多个 Bundle ID，我的理解也就是多个 A
 
 #### *Basic*####
 
-##### *Architextures*（[参考](http://www.jianshu.com/p/3fce0bd6f045)）#####
+##### *Architextures*（[其他参考](http://www.jianshu.com/p/3fce0bd6f045)）#####
 
 ###### *Architextures*：
 
@@ -150,11 +150,45 @@ iCloud container ID 可以对应多个 Bundle ID，我的理解也就是多个 A
 
 ##### *Build Options*#####
 
+###### Validate Build Product: 
+
+是否对 Build 出的包进行验证，通常只在 **Configuration** 的 Release 模式下选择 YES，其他都是 NO，以节约时间。
+
 ##### *Code Signing*#####
+
+是 macOS 的一项安全技术，可以用来证明一个 App 的二进制程序包是由开发者创建的。也就是说一旦一个 App 被签名，系统可以检测到它的任何改变，无论这个改变是恶意代码的有意破坏还是无意的人为造成。
+
+[官方参考](https://developer.apple.com/library/content/documentation/Security/Conceptual/CodeSigningGuide/Introduction/Introduction.html) 	[其他参考](https://www.objc.io/issues/17-security/inside-code-signing/)
+
+###### Code Signing Entitlements:（证书签名授权文件）
+
+指定签名授权文件的路径，通常是把名称为 project_name.entitlements 的授权文件添加到项目中，然后在这里设置文件的名称 "project_name.entitlements" 即可。 这个文件也是 XML 格式的，记录了相关签名证书 ID 和 Bundle ID 的组合字符串作为 KeyChain，以及在一组 App 中共享信息用的 GroupKeyChain。
+
+###### Code Signing Identity:
+
+对应一个已经安装到系统 KeyChain 里的有效签名证书。一般就是一个后缀是 p12 的文件，双击就可以安装到系统的 KeyChain 里。先设置了 **Provisioning Profile** 之后，会自动显示相对应的签名证书。 如果没有对应的签名证书或者证书已失效，Build 项目的时候就会触发错误提示。
+
+###### Provisioning Profile:（描述文件）
+
+一个和 **Code Signing Identity** 要求的签名证书（p12 文件）相关的设备描述文件，后缀名一般 mobileprovision。双击文件可以自动添加到 Xcode 系统中，如果这个配置项和  **Code Signing Identity** 对应不上或者失效，Build 项目的时候就会触发错误提示。
 
 ##### *Deployment*#####
 
+###### Strip Debug Symbols During Copy:
+
+指定是否在 Build 项目时，剥离二进制文件中用于调试的符号信息。通常在 **Configuration** 为 Release 时设置为 YES，剥离调试信息可以减小二进制文件的大小，也就减小了 App 包的大小。但是 Build 过程中剥离调试信息需要额外的时间，所以通常在非 Release 模式选择 NO，以便节约时间。
+
+Deployment 下其他的子选项简单易懂，不多说。
+
 ##### *Linking*#####
+
+###### Other Linker Flags:
+
+这里主要设置项目连接需要用到的第三方库文件，配置内容和 Make file 中的连接选项一样，例如：
+
+-lxml2 -lz
+
+-l 表示连接一个外部的库，xml2 表示这个库文件的标识，通常一个库文件的名字的命名规则是：lib + 标识串 + 后缀[.a 或 .so 或 .framework等]。例如 xml2 对应的库文件可能是：libxml2.a 或 libxml2.so。
 
 ##### *Packaging*#####
 
